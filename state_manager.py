@@ -36,7 +36,7 @@ def save_state(state):
     os.replace(tmp, config.STATE_FILE)
 
 
-def _fresh_state(retention_day, window_end, skip_phase_a=False):
+def _fresh_state(retention_day, window_end, skip_phase_a=False, total_shards=1):
     return {
         "status": "in_progress",
         "retention_day": str(retention_day),
@@ -45,11 +45,12 @@ def _fresh_state(retention_day, window_end, skip_phase_a=False):
         "phase_a_done_repos": [],
         "phase_b_done_runs": [],
         "phase_b_massive_runs": [],
-        "run_url_lookup": {}
+        "run_url_lookup": {},
+        "total_shards": total_shards  
     }
 
 
-def resolve_startup(expected_repo_count=0):
+def resolve_startup(expected_repo_count=0, current_total_shards=1):
     """
     Determines what the current run should do based on existing state.
 
@@ -65,7 +66,7 @@ def resolve_startup(expected_repo_count=0):
 
     # ── First ever run ────────────────────────────────────────────────────────
     if state is None:
-        state = _fresh_state(new_retention_day, new_window_end)
+        state = _fresh_state(new_retention_day, new_window_end, total_shards=current_total_shards)
         save_state(state)
         return state, str(new_retention_day), str(new_window_end), False
 
@@ -98,37 +99,38 @@ def resolve_startup(expected_repo_count=0):
     saved_retention_day = date.fromisoformat(state['retention_day'])
 
     if new_retention_day == saved_retention_day:
-        # NEW LOGIC: Check if the dataset grew since we "completed" it!
-        done_count = len(state.get('phase_a_done_repos', []))
-        print(done_count, expected_repo_count)
-        if done_count < expected_repo_count:
-            print(f"[*] Dataset expanded ({done_count} done, {expected_repo_count} expected). Resuming today's window.")
-            state['status'] = 'in_progress'
-            save_state(state)
-            return state, str(new_retention_day), state['cursor'], False
-        # Dataset is complete — fall through to the cursor-advancement logic below
-
-
+        
+        # NEW: Check if the user changed the shard count!
+        saved_shards = state.get('total_shards', current_total_shards)
+        
+        if saved_shards == current_total_shards:
+            # Shard count is the same, so it's a genuine dataset expansion
+            done_count = len(state.get('phase_a_done_repos', []))
+            if done_count < expected_repo_count:
+                print(f"[*] Dataset expanded ({done_count} done, {expected_repo_count} expected). Resuming today's window.")
+                state['status'] = 'in_progress'
+                save_state(state)
+                return state, str(new_retention_day), state['cursor'], False
+        else:
+            # Shard count changed! Bypass the expansion check safely.
+            print(f"[*] Shard count changed from {saved_shards} to {current_total_shards}. Bypassing dataset expansion check.")
+            
     if new_retention_day <= cursor:
-        # The natural retention_day is still inside the completed window.
-        # Don't wait — immediately advance to the next window.
         next_retention_day = cursor + timedelta(days=1)
         next_window_end = next_retention_day + timedelta(days=config.WINDOW_DAYS - 1)
 
-        # Guard: don't fetch data if we are in grace period (last 7 days — runs may still be active)
         if next_retention_day > today - timedelta(days=config.GRACE_PERIOD_DAYS):
-            print(f"[*] Next window ({next_retention_day}) is in the grace period. Waiting until it we pass the grace period...")
+            print(f"[*] Next window ({next_retention_day}) is in the grace period...")
             return None, None, None, None
 
-        print(f"[*] Previous window ({saved_retention_day} to {cursor}) complete. Advancing to next window: {next_retention_day} to {next_window_end}")
-        state = _fresh_state(next_retention_day, next_window_end)
+        # NEW: Pass current_total_shards to the next window
+        state = _fresh_state(next_retention_day, next_window_end, total_shards=current_total_shards)
         save_state(state)
         return state, str(next_retention_day), str(next_window_end), False
-
-    # New retention_day is beyond the cursor — full run with a fresh window.
-    state = _fresh_state(new_retention_day, new_window_end, skip_phase_a=False)
+        
+    # Full run with a fresh window
+    state = _fresh_state(new_retention_day, new_window_end, skip_phase_a=False, total_shards=current_total_shards)
     save_state(state)
-    
     return state, str(new_retention_day), str(new_window_end), False
 
 

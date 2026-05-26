@@ -42,8 +42,8 @@ def main():
 
 
     while True:
-
-        state, retention_day_str, window_end_str, skip_phase_a = resolve_startup(len(repos))
+        
+        state, retention_day_str, window_end_str, skip_phase_a = resolve_startup(len(repos), total_shards)
         if state is None:
             print("[*] All windows up to date (grace period reached). Exiting.")
 
