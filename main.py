@@ -4,7 +4,6 @@ import os
 import json
 import csv
 from tqdm import tqdm
-
 from environment_setup import setup_environment, diag_start_window, diag_end_window
 import config
 from data_handlers import load_test_repos
@@ -24,18 +23,15 @@ def main():
 
     args = parse_args()
     
-    # Parse the shard info
     shard_idx, total_shards = map(int, args.worker.split('/'))
     
     print(f"[*] Starting worker {shard_idx} out of {total_shards} total shards. Test limit: {args.test if args.test else 'None'}")
-    # --- ISOLATION SETUP ---
-    # 1. Override the global token
+
     config.GITHUB_TOKEN = args.token 
     
     # Load the repos FIRST so we know how many there are
     repos = load_test_repos(args.input, args.test, shard_idx, total_shards)
 
-    # Create the states folder and assign the file path
     os.makedirs(config.STATE_DIR, exist_ok=True)
     config.STATE_FILE = os.path.join(config.STATE_DIR, f"pipeline_state_shard_{shard_idx}.json")
 
@@ -47,7 +43,7 @@ def main():
         if state is None:
             print("[*] All windows up to date (grace period reached). Exiting.")
 
-            break  # already up to date
+            break  
         
 
         # date-stamped output files — each window/day gets its own file
@@ -80,8 +76,8 @@ def main():
         graphql_buffer = []  
         massive_runs_buffer = []  
         run_url_lookup = {}
-        massive_runs_restored = 0   # restored from state (previous session)
-        massive_new_count = 0       # identified as massive in this session
+        massive_runs_restored = 0  
+        massive_new_count = 0      
 
         phase_a_done = set(state['phase_a_done_repos'])
         phase_b_done = set(state['phase_b_done_runs'])
@@ -89,7 +85,7 @@ def main():
         print(f"\n[*] Process started... retention_day={retention_day_str}, skip_phase_a={skip_phase_a}")
 
         # Rebuild Phase B buffer from disk when Phase A is fully complete (covers both
-        # skip_phase_a days AND crash-during-cleanup-crew resumes)
+        # skip_phase_a days abd crash-during-cleanup-crew resumes)
         need_rebuild_phase_b = skip_phase_a or (len(repos) > 0 and len(phase_a_done) == len(repos))
 
         # Restore massive runs that were identified before a mid-Phase-A crash
@@ -101,7 +97,7 @@ def main():
 
         if need_rebuild_phase_b:
             print("[*] Loading Phase B targets from runs file...")
-            # Restore known massive runs directly — do NOT re-query them through GraphQL.
+            # Restore known massive runs directly into the massive_runs_buffer so they skip the GraphQL queue and go straight to the cleanup crew. 
             # Without this, they'd be re-added to graphql_buffer and lost if GitHub returns null.
             if state.get('phase_b_massive_runs'):
                 saved_massive_ids = set(state['phase_b_massive_runs'])
@@ -142,7 +138,7 @@ def main():
         with open(runs_file, "a", encoding="utf-8") as runs_out, open(details_file, "a", encoding="utf-8") as details_out:
             if not need_rebuild_phase_b:
                 for repo in tqdm(repos, desc="Phase A: Discovery", unit="repo"):
-                    # RESUME: skip repos already completed in a previous interrupted run
+
                     if repo in phase_a_done:
                         continue
 
@@ -166,7 +162,6 @@ def main():
                         event = run.get('event', '')
                         node_id = run.get('check_suite_node_id')
                         
-                        # if run_date == retention_day_str and event not in ['pull_request', 'pull_request_target'] and node_id:
                         if event not in ['pull_request', 'pull_request_target'] and node_id:
                             db_id = run.get('check_suite_id')
                             if db_id and db_id not in phase_b_done:
@@ -199,7 +194,7 @@ def main():
                                 db_id = node.get('databaseId')
                                 massive_runs_buffer.append(db_id)
                                 massive_new_count += 1
-                                # Save to state so it survives a crash!
+
                                 state.setdefault('phase_b_massive_runs', []).append(db_id)
                                 state.setdefault('run_url_lookup', {})[str(db_id)] = run_url_lookup.get(str(db_id))
                                 save_state(state)
@@ -220,7 +215,7 @@ def main():
                     state['phase_a_done_repos'].append(repo)
                     save_state(state)
                             
-            # 3. FINAL FLUSH (handles skip_phase_a buffer too)
+            # 3. Final flush (handles skip_phase_a buffer too)
             if len(graphql_buffer) > 0:
                 total_runs_sent_to_graphql += len(graphql_buffer)
                 nodes, cost, remaining = fetch_with_dynamic_resizing(graphql_buffer, args.token)
@@ -232,7 +227,7 @@ def main():
                         continue
                     db_id = node.get('databaseId')
                     if db_id in phase_b_done: 
-                        continue  # optional dedup guard
+                        continue  
                     check_runs_data = node.get('checkRuns', {})
                     jobs = check_runs_data.get('nodes', [])
                     
@@ -257,11 +252,9 @@ def main():
                     state['phase_b_done_runs'].extend(newly_done)
                 save_state(state)  # one save covers both newly_done and any new massive runs
 
-            # =========================================================================
-            # 4. THE CLEANUP CREW (REST API for 1% Massive Runs)
-            # =========================================================================
+            # 4. The cleanup crew (REST API for 1% Massive Runs)
             if massive_runs_buffer:
-                massive_runs_buffer = list(set(massive_runs_buffer)) # Dedup the buffer!
+                massive_runs_buffer = list(set(massive_runs_buffer)) 
 
                 print(f"\n[*] CLEANUP CREW: Fetching {len(massive_runs_buffer)} massive runs via REST...")
                 for node_id in tqdm(massive_runs_buffer, desc="Fetching Massive Runs"):
@@ -300,12 +293,10 @@ def main():
                             
                         details_out.write(json.dumps(gql_mimic) + "\n")
 
-                        # Bug 2: checkpoint cleanup crew progress so resume skips these
                         state['phase_b_done_runs'].append(node_id)
                         phase_b_done.add(node_id)
                         save_state(state)
                         
-                        # Count the massive runs too!
                         total_jobs_fetched += len(gql_mimic['checkRuns']['nodes'])
                         for j in gql_mimic['checkRuns']['nodes']:
                             total_steps_fetched += len(j['steps']['nodes'])
@@ -314,7 +305,6 @@ def main():
         total_nodes_fetched = total_jobs_fetched + total_steps_fetched
 
 
-        # Calculate combined REST calls
         total_rest_calls = total_rest_discovery_calls + total_rest_crew_calls
 
         report_text = f"""
