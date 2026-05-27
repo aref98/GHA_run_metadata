@@ -8,7 +8,6 @@ def test_clean_repo_name():
     assert _clean_repo_name("invalid_string") is None
 
 def test_fresh_state():
-    # Test that the state manager initializes correctly
     state = _fresh_state("2026-01-01", "2026-01-07", skip_phase_a=True, total_shards=5)
     assert state["status"] == "in_progress"
     assert state["total_shards"] == 5
