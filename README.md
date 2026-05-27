@@ -12,6 +12,7 @@ A fault-tolerant, large-scale data extraction pipeline designed to collect massi
 
 
 ```mermaid
+%%{init: {'themeVariables': { 'edgeLabelBackground': 'transparent'}}}%%
 flowchart TD
     %% Base Node Styling: Smaller boxes, bigger/bolder fonts
     classDef core fill:#f3f4f6,stroke:#9e9e9e,stroke-width:2px,font-size:14px,font-weight:bold,padding:5px;
