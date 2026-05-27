@@ -73,7 +73,7 @@ The pipeline will automatically determine the correct 7-day collection window, r
 - `.txt` — one `owner/repo` per line, or comma-separated on a single line
 - Full GitHub URLs (e.g. `https://github.com/owner/repo`) are also accepted and normalized automatically
 
-## 📖 Examples
+## Examples
 
 **1. Basic Single-Worker Run**
 Collect data for a custom repository list on a single machine:
@@ -109,7 +109,7 @@ python main.py --token ghp_TOKEN_C --input repos.txt --worker 2/3
 
 Each worker processes a disjoint subset of the repository list and writes its output to separate shard-stamped files (e.g. `runs_shard_0_DATE.jsonl`, `runs_shard_1_DATE.jsonl`).
 
-## 📝 Citation
+## Citation
 
 If you use this tool or the accompanying dataset in your research, please cite our ICSME 2026 paper:
 
@@ -127,6 +127,6 @@ If you use this tool or the accompanying dataset in your research, please cite o
 
 ```
 
-## 📄 License
+## License
 
 This project is licensed under GNU Lesser General Public License v3.
