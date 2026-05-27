@@ -15,17 +15,15 @@ A fault-tolerant, large-scale data extraction pipeline designed to collect massi
 %%{init: {'themeVariables': { 'edgeLabelBackground': 'transparent'}}}%%
 flowchart TD
     %% Base Node Styling: Smaller boxes, bigger/bolder fonts
-    classDef core fill:#f3f4f6,stroke:#9e9e9e,stroke-width:2px,font-size:14px,font-weight:bold,padding:5px;
-    classDef phaseA fill:#bbdefb,stroke:#0288d1,stroke-width:2px,font-size:14px,font-weight:bold,padding:5px;
-    classDef phaseB fill:#c8e6c9,stroke:#388e3c,stroke-width:2px,font-size:14px,font-weight:bold,padding:5px;
-    classDef phaseC fill:#ffe082,stroke:#f57c00,stroke-width:2px,font-size:14px,font-weight:bold,padding:5px;
-    classDef decision fill:#fff9c4,stroke:#fbc02d,stroke-width:2px,font-size:14px,font-weight:bold,padding:5px;
-    classDef endpoint fill:#374151,color:#fff,stroke:#374151,stroke-width:2px,font-size:16px,font-weight:bold,padding:8px;
+    classDef core fill:#f3f4f6,stroke:#9e9e9e,stroke-width:2px,font-size:7px,font-weight:bold,padding:5px;
+    classDef phaseA fill:#bbdefb,stroke:#0288d1,stroke-width:2px,font-size:7px,font-weight:bold,padding:5px;
+    classDef phaseB fill:#c8e6c9,stroke:#388e3c,stroke-width:2px,font-size:7px,font-weight:bold,padding:5px;
+    classDef phaseC fill:#ffe082,stroke:#f57c00,stroke-width:2px,font-size:7px,font-weight:bold,padding:5px;
+    classDef decision fill:#fff9c4,stroke:#fbc02d,stroke-width:2px,font-size:7px,font-weight:bold,padding:5px;
+    classDef endpoint fill:#374151,color:#fff,stroke:#374151,stroke-width:2px,font-size:7px,font-weight:bold,padding:8px;
 
     %% Subgraph Background Styling (Semi-transparent with matching borders)
-    classDef bgA fill:#e3f2fd,stroke:#0288d1,stroke-width:2px,stroke-dasharray: 5 5;
-    classDef bgB fill:#e8f5e9,stroke:#388e3c,stroke-width:2px,stroke-dasharray: 5 5;
-    classDef bgC fill:#fff8e1,stroke:#f57c00,stroke-width:2px,stroke-dasharray: 5 5;
+
     classDef bgTransparent fill:none,stroke:none;
 
     %% Initial Steps
