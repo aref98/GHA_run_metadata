@@ -9,9 +9,9 @@
 A large-scale data extraction pipeline designed to collect massive datasets of GitHub Actions workflow runs, jobs, steps. This tool was developed for the **ICSME 2026 Data Track** to support empirical research on CI/CD reliability and maintainability.
 
 <p align="center">
-  <img src="docs/activity_diagram6.svg" alt="Activity diagram" width="1200">
+  <img src="docs/activity_diagram6.svg" alt="Activity diagram of GHARuns_Collector" width="1200">
 </p>
 
 <p align="center">
-  <text Activity Diagram of GHARuns_Collector>
+  <em>Figure 1: High-level activity diagram of the GHARuns_Collector workflow.</em>
 </p>
