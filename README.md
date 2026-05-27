@@ -11,3 +11,7 @@ A large-scale data extraction pipeline designed to collect massive datasets of G
 <p align="center">
   <img src="docs/activity_diagram6.svg" alt="Activity diagram" width="1200">
 </p>
+
+<p align="center">
+  <text Activity Diagram of GHARuns_Collector>
+</p>
