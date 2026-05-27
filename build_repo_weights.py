@@ -1,9 +1,8 @@
 """
-One-time script: scan all runs_shard_* JSONL files and count total runs per repo.
-Output: repo_weights.csv  (columns: repository, run_count)
+** You do NOT need to run this script **
+** For anyone wondering, where this script fits in:
+This is a one-time script to build the repo_weights.csv file, which assigns a weight to each repository based on the number of historical runs it has in the collected data. This weighting is used to prioritize repositories with more activity when sharding the workload for the new 10-worker collection. This was used in our data collection process to ensure that we focus more on repositories that have more historical runs, which are likely to yield richer data for our analysis.
 
-Run once before starting the new 10-worker collection:
-    python build_repo_weights.py
 """
 
 import glob
