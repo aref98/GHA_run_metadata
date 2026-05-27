@@ -19,7 +19,7 @@ Mining GitHub Actions workflows run metadata at scale is severely constrained by
   <em>Figure 1: High-level activity diagram of the GHARuns_Collector pipeline</em>
 </p>
 
-The pipeline operates in three sequential phases per time window:
+The pipeline (illustrated in Figure 1) operates in three sequential phases per time window:
 
 **Phase A — REST Discovery:** For each repository in the assigned shard, the tool queries the GitHub REST API (`/actions/runs`) to discover all workflow runs that completed within the current 7-day retention window. Discovered runs are immediately written to a `runs.jsonl` file and their check suite IDs are enqueued into a GraphQL buffer. This phase is skipped on days where runs were already collected within the same window.
 
