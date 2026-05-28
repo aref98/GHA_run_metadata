@@ -5,6 +5,7 @@
 [![Dependabot](https://badgen.net/badge/Dependabot/enabled/green?icon=dependabot)](https://dependabot.com/)
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 [![Last Commit](https://img.shields.io/github/last-commit/aref98/GHA_run_metadata)](https://github.com/aref98/GHA_run_metadata/commits/main)
+[![SWH](https://archive.softwareheritage.org/badge/swh:1:dir:YOUR_SWHID_HERE/)](https://archive.softwareheritage.org/swh:1:dir:5eea687b596faf11a1f199260dd2e3d3d336434c;origin=https://github.com/sgl-umons/gharuns-collector)
 
 A large-scale data extraction pipeline designed to collect massive datasets (GHARuns) of GitHub Actions workflow runs, jobs, steps. This tool was developed for the **ICSME 2026 Data Track** to support empirical research on CI/CD reliability and maintainability.
 
