@@ -117,12 +117,12 @@ If you use this tool or the accompanying dataset in your research, please cite o
 
 ```bibtex
 
-@inproceedings{Talebzadeh2026-ICSME,
-      title={On the {GitHub Actions} Language: Usage, Evolution, and Workflow Reliability}, 
-      author={Aref Talebzadeh Bardsiri and Alexandre Decan and Tom Mens},
+@inproceedings{Talebzadeh2026GHARuns,
+      title={GHARuns: A large dataset of GitHub Actions workflow execution metadata}, 
+      author={Aref Talebzadeh Bardsiri, Tom Mens, Alexandre Decan},
       year={2026},
 	  booktitle = {International Conference on Software Maintenance and Evolution ({ICSME})},
-	  note = {To appear},
+	  note = {Submitted},
 	  publisher={IEEE}
 }
 
