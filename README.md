@@ -121,7 +121,7 @@ If you use this tool or the accompanying dataset in your research, please cite o
       title={GHARuns: A large dataset of GitHub Actions workflow execution metadata}, 
       author={Aref Talebzadeh Bardsiri, Tom Mens, Alexandre Decan},
       year={2026},
-	  booktitle = {International Conference on Software Maintenance and Evolution ({ICSME})},
+	  booktitle = {International Conference on Software Maintenance and Evolution (ICSME)},
 	  note = {Submitted},
 	  publisher={IEEE}
 }
